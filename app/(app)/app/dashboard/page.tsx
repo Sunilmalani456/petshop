@@ -7,15 +7,6 @@ import Stats from "@/components/stats";
 import React from "react";
 
 const Dashboard = async () => {
-  const response = await fetch(
-    "https://bytegrad.com/course-assets/projects/petsoft/api/pets"
-  );
-
-  if (!response.ok) {
-    throw new Error("Failed to fetch pets");
-  }
-
-  const PetData = await response.json();
   return (
     <main>
       <div className="flex items-center justify-between text-white py-8">
@@ -31,7 +22,7 @@ const Dashboard = async () => {
 
         <div className="relative md:row-start-2 md:row-span-full md:col-start-1 md:col-span-1">
           <ContentBlock>
-            <PetList PetData={PetData} />
+            <PetList />
           </ContentBlock>
         </div>
 

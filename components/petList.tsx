@@ -1,23 +1,27 @@
+"use client";
+
+import { usePetContext } from "@/lib/hooks";
 import { pet } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import React from "react";
 
-type PetProps = {
-  PetData: pet[];
-};
+// type PetProps = {
+//   PetData: pet[];
+// };
 
-const PetList = ({ PetData }: PetProps) => {
+const PetList = () => {
+  const { pets, selectedPetId, handleChangeSelectedPetId } = usePetContext();
   return (
     <ul className="bg-white border-b border-light">
-      {PetData.map((pet) => (
+      {pets?.map((pet) => (
         <li key={pet.id}>
           <button
-            // onClick={() => handleChangeSelectedPetId(pet.id)}
+            onClick={() => handleChangeSelectedPetId(pet.id)}
             className={cn(
               "flex items-center h-[70px] w-full cursor-pointer px-5 text-base gap-3 hover:bg-[#EFF1F2] focus:bg-[#EFF1F2] transition",
               {
-                // "bg-[#EFF1F2]": selectedPetId === pet.id,
+                "bg-[#EFF1F2]": selectedPetId === pet.id,
               }
             )}
           >
@@ -29,10 +33,7 @@ const PetList = ({ PetData }: PetProps) => {
               height={45}
               className="w-[45px] h-[45px] rounded-full object-cover"
             />
-            <p className="font-semibold">
-              Dogy
-              {/* {pet.name} */}
-            </p>
+            <p className="font-semibold">{pet.name}</p>
           </button>
         </li>
       ))}
