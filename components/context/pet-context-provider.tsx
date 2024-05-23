@@ -24,6 +24,8 @@ const PetContextProvider = ({ data, children }: PetContextProviderProps) => {
   // derived state
   const selectedPet = pets.find((pet) => pet.id === selectedPetId);
 
+  // console.log(selectedPet);
+
   const handleChangeSelectedPetId = (id: string) => {
     setSelectedPetId(id);
   };

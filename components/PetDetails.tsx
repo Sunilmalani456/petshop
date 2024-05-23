@@ -11,7 +11,10 @@ const PetDetails = () => {
     <section className="flex flex-col h-full w-full">
       <div className="flex items-center bg-white px-8 py-5 border-b border-light">
         <Image
-          src={selectedPet?.imageUrl}
+          src={
+            selectedPet?.imageUrl ||
+            "https://bytegrad.com/course-assets/react-nextjs/pet-placeholder.png"
+          }
           alt="Selected pet image"
           height={75}
           width={75}
