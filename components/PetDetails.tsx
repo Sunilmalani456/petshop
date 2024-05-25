@@ -1,10 +1,11 @@
 "use client";
 
+import { DeletePet } from "@/actions/petAction";
 import { usePetContext } from "@/lib/hooks";
 import { pet } from "@/lib/types";
 import Image from "next/image";
-import React from "react";
 import PetButton from "./pet-button";
+import { startTransition, useTransition } from "react";
 
 const PetDetails = () => {
   const { selectedPet } = usePetContext();
@@ -32,6 +33,7 @@ type Props = {
 
 function TopBar({ pet }: Props) {
   const { handleCheckOut } = usePetContext();
+  const [isPending, startTransition] = useTransition();
 
   return (
     <div className="flex items-center bg-white px-8 py-5 border-b border-light">
@@ -49,8 +51,13 @@ function TopBar({ pet }: Props) {
       <div className="ml-auto space-x-2">
         <PetButton actionType="edit">Edit</PetButton>
         <PetButton
+          disabled={isPending}
           actionType="checkout"
-          onClick={() => handleCheckOut(pet?.id as string)}
+          onClick={async () => {
+            startTransition(async () => {
+              await DeletePet(pet?.id as string);
+            });
+          }}
         >
           Checkout
         </PetButton>

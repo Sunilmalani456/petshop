@@ -15,15 +15,21 @@ import PetForm from "./pet-form";
 type PetButtonProps = {
   actionType: "edit" | "checkout" | "add";
   children?: React.ReactNode;
+  disabled?: boolean;
   onClick?: () => void;
 };
 
-const PetButton = ({ actionType, onClick, children }: PetButtonProps) => {
+const PetButton = ({
+  disabled,
+  actionType,
+  onClick,
+  children,
+}: PetButtonProps) => {
   const [isFormOpen, setIsFormOpen] = useState(false);
 
   if (actionType === "checkout") {
     return (
-      <Button onClick={onClick} variant={"secondary"} size="icon">
+      <Button disabled={disabled} onClick={onClick} variant={"secondary"}>
         {children}
       </Button>
     );
@@ -37,7 +43,7 @@ const PetButton = ({ actionType, onClick, children }: PetButtonProps) => {
             <PlusIcon className="h-6 w-6" />
           </Button>
         ) : (
-          <Button variant={"secondary"} size="icon">
+          <Button className="" variant={"secondary"}>
             {children}
           </Button>
         )}

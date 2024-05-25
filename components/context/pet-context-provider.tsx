@@ -1,5 +1,6 @@
 "use client";
 
+import { AddPet } from "@/actions/petAction";
 import { pet } from "@/lib/types";
 import React, { createContext, useState } from "react";
 
@@ -21,8 +22,10 @@ type PetContextProps = {
 
 export const petContext = createContext<PetContextProps | null>(null);
 
-const PetContextProvider = ({ data, children }: PetContextProviderProps) => {
-  const [pets, setPets] = useState(data);
+const PetContextProvider = ({
+  data: pets,
+  children,
+}: PetContextProviderProps) => {
   const [selectedPetId, setSelectedPetId] = useState<string | null>(null);
 
   // derived state
@@ -31,31 +34,32 @@ const PetContextProvider = ({ data, children }: PetContextProviderProps) => {
 
   // event handlers / actions
   const handleAddPet = async (newPet: Omit<pet, "id">) => {
-    setPets((pre) => [
-      ...pre,
-      {
-        id: Math.random().toString(36).substr(2, 9),
-        ...newPet,
-      },
-    ]);
+    // setPets((pre) => [
+    //   ...pre,
+    //   {
+    //     id: Math.random().toString(36).substr(2, 9),
+    //     ...newPet,
+    //   },
+    // ]);
+    await AddPet(newPet);
   };
 
   const handleEditPet = (petId: string, newData: Omit<pet, "id">) => {
-    setPets((pre) =>
-      pre.map((pet) => {
-        if (pet.id === petId) {
-          return {
-            id: petId,
-            ...newData,
-          };
-        }
-        return pet;
-      })
-    );
+    // setPets((pre) =>
+    //   pre.map((pet) => {
+    //     if (pet.id === petId) {
+    //       return {
+    //         id: petId,
+    //         ...newData,
+    //       };
+    //     }
+    //     return pet;
+    //   })
+    // );
   };
 
   const handleCheckOut = (id: string) => {
-    setPets((pre) => pre.filter((pet) => pet.id !== id));
+    // setPets((pre) => pre.filter((pet) => pet.id !== id));
     setSelectedPetId(null);
   };
 
