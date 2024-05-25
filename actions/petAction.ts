@@ -1,11 +1,18 @@
 "use server";
 
 import prisma from "@/lib/db";
-import { PetEssential } from "@/lib/types";
-import { Pet } from "@prisma/client";
+import { petFormSchema, petIdSchema } from "@/lib/validation";
 import { revalidatePath } from "next/cache";
 
-export const AddPet = async (petData: PetEssential) => {
+export const AddPet = async (petData: unknown) => {
+  const validatedPet = petFormSchema.safeParse(petData);
+
+  if (!validatedPet.success) {
+    return {
+      message: "Invalid Pet Data. Please provide valid",
+    };
+  }
+
   try {
     // await prisma.pet.create({
     //   data: {
@@ -20,7 +27,7 @@ export const AddPet = async (petData: PetEssential) => {
     // });
 
     await prisma.pet.create({
-      data: petData,
+      data: validatedPet.data,
     });
 
     revalidatePath("/app", "layout");
@@ -32,7 +39,16 @@ export const AddPet = async (petData: PetEssential) => {
   }
 };
 
-export const EditPet = async (petId: Pet["id"], newPetData: PetEssential) => {
+export const EditPet = async (petId: unknown, newPetData: unknown) => {
+  const validatedPet = petFormSchema.safeParse(newPetData);
+  const validatedPetId = petIdSchema.safeParse(petId);
+
+  if (!validatedPetId.success || !validatedPet.success) {
+    return {
+      message: "Invalid Pet Data. Please provide valid",
+    };
+  }
+
   try {
     // await prisma.pet.update({
     //   where: {
@@ -51,9 +67,9 @@ export const EditPet = async (petId: Pet["id"], newPetData: PetEssential) => {
 
     await prisma.pet.update({
       where: {
-        id: petId,
+        id: validatedPetId.data,
       },
-      data: newPetData,
+      data: validatedPet.data,
     });
 
     revalidatePath("/app", "layout");
@@ -65,11 +81,18 @@ export const EditPet = async (petId: Pet["id"], newPetData: PetEssential) => {
   }
 };
 
-export const DeletePet = async (petId: Pet["id"]) => {
+export const DeletePet = async (petId: unknown) => {
+  const validatedPetId = petIdSchema.safeParse(petId);
+
+  if (!validatedPetId.success) {
+    return {
+      message: "Invalid Pet Data. Please provide valid",
+    };
+  }
   try {
     await prisma.pet.delete({
       where: {
-        id: petId,
+        id: validatedPetId.data,
       },
     });
 
