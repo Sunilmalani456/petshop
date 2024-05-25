@@ -1,11 +1,10 @@
 "use client";
 
-import { DeletePet } from "@/actions/petAction";
 import { usePetContext } from "@/lib/hooks";
-import { pet } from "@/lib/types";
 import Image from "next/image";
 import PetButton from "./pet-button";
-import { startTransition, useTransition } from "react";
+// import { startTransition, useTransition} from "react";
+import { Pet } from "@prisma/client";
 
 const PetDetails = () => {
   const { selectedPet } = usePetContext();
@@ -28,12 +27,12 @@ const PetDetails = () => {
 };
 
 type Props = {
-  pet: pet | undefined;
+  pet: Pet;
 };
 
 function TopBar({ pet }: Props) {
   const { handleCheckOut } = usePetContext();
-  const [isPending, startTransition] = useTransition();
+  // const [isPending, startTransition] = useTransition();
 
   return (
     <div className="flex items-center bg-white px-8 py-5 border-b border-light">
@@ -46,14 +45,14 @@ function TopBar({ pet }: Props) {
         className="h-[75px] w-[75px] rounded-full object-cover"
       />
 
-      <h2 className="text-3xl font-semibold leading-7 ml-5">{pet?.name}</h2>
+      <h2 className="text-3xl font-semibold leading-7 ml-5">{pet.name}</h2>
 
       <div className="ml-auto space-x-2">
         <PetButton actionType="edit">Edit</PetButton>
         <PetButton
-          disabled={isPending}
+          // disabled={isPending}
           actionType="checkout"
-          onClick={async () => await handleCheckOut(pet?.id as string)}
+          onClick={async () => await handleCheckOut(pet.id)}
           // {
           // startTransition(async () => {
           //   await DeletePet(pet?.id as string);
@@ -82,12 +81,12 @@ function OtherInfo({ pet }: Props) {
         <h3 className="text-[13px] font-medium uppercase text-zinc-700">
           Owner name
         </h3>
-        <p className="mt-1 text-lg text-zinc-800">{pet?.ownerName}</p>
+        <p className="mt-1 text-lg text-zinc-800">{pet.ownerName}</p>
       </div>
 
       <div>
         <h3 className="text-[13px] font-medium uppercase text-zinc-700">Age</h3>
-        <p className="mt-1 text-lg text-zinc-800">{pet?.age}</p>
+        <p className="mt-1 text-lg text-zinc-800">{pet.age}</p>
       </div>
     </div>
   );
@@ -96,7 +95,7 @@ function OtherInfo({ pet }: Props) {
 function Notes({ pet }: Props) {
   return (
     <section className="flex-1 bg-white px-7 py-5 rounded-md mb-9 mx-8 border border-light">
-      {pet?.notes}
+      {pet.notes}
     </section>
   );
 }

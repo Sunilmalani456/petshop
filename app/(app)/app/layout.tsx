@@ -5,8 +5,8 @@ import PetContextProvider from "@/components/context/pet-context-provider";
 import SearchContextProvider from "@/components/context/search-context-provider";
 import React from "react";
 import prisma from "@/lib/db";
-import { pet } from "@/lib/types";
 import { Toaster } from "sonner";
+import { Pet } from "@prisma/client";
 
 const AppLayout = async ({ children }: { children: React.ReactNode }) => {
   // const response = await fetch(
@@ -19,7 +19,7 @@ const AppLayout = async ({ children }: { children: React.ReactNode }) => {
 
   // const PetData: pet[] = await response.json();
 
-  const PetData: pet[] = await prisma.pet.findMany();
+  const PetData: Pet[] = await prisma.pet.findMany();
 
   return (
     <>
