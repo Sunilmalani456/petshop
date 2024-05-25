@@ -1,7 +1,7 @@
 import { usePetContext } from "@/lib/hooks";
 import React from "react";
 import { Button } from "./ui/button";
-import { Input, Input } from "./ui/input";
+import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Textarea } from "./ui/textarea";
 
