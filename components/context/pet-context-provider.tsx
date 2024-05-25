@@ -11,6 +11,7 @@ type PetContextProviderProps = {
 type PetContextProps = {
   pets: pet[];
   selectedPetId: string | null;
+  handleCheckOut: (id: string) => void;
   numberOfPets: number;
   handleChangeSelectedPetId: (id: string) => void;
   selectedPet: pet | undefined;
@@ -28,6 +29,11 @@ const PetContextProvider = ({ data, children }: PetContextProviderProps) => {
 
   // console.log(selectedPet);
 
+  const handleCheckOut = (id: string) => {
+    setPets((pre) => pre.filter((pet) => pet.id !== id));
+    setSelectedPetId(null);
+  };
+
   const handleChangeSelectedPetId = (id: string) => {
     setSelectedPetId(id);
   };
@@ -40,6 +46,7 @@ const PetContextProvider = ({ data, children }: PetContextProviderProps) => {
         numberOfPets,
         selectedPet,
         handleChangeSelectedPetId,
+        handleCheckOut,
       }}
     >
       {children}

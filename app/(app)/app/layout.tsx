@@ -3,6 +3,7 @@ import AppHeader from "@/components/app-header";
 import BackgroundPattern from "@/components/background-pattern";
 import PetContextProvider from "@/components/context/pet-context-provider";
 import SearchContextProvider from "@/components/context/search-context-provider";
+import { pet } from "@/lib/types";
 import React from "react";
 
 const AppLayout = async ({ children }: { children: React.ReactNode }) => {
@@ -14,7 +15,7 @@ const AppLayout = async ({ children }: { children: React.ReactNode }) => {
     throw new Error("Failed to fetch pets");
   }
 
-  const PetData = await response.json();
+  const PetData: pet[] = await response.json();
 
   return (
     <>
