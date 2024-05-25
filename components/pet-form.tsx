@@ -13,7 +13,7 @@ type PetFormProps = {
 };
 
 const PetForm = ({ actionType, onFormSubmission }: PetFormProps) => {
-  const { selectedPet } = usePetContext();
+  const { selectedPet, handleAddPet, handleEditPet } = usePetContext();
   // const [error, formAction] = useFormState(AddPet, {});
 
   // const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -46,20 +46,23 @@ const PetForm = ({ actionType, onFormSubmission }: PetFormProps) => {
     <form
       // onSubmit={formAction}
       action={async (formData) => {
-        if (actionType === "add") {
-          const error = await AddPet(formData);
-          if (error) {
-            toast.warning(error.message);
-            return;
-          }
-        } else if (actionType === "edit") {
-          const error = await EditPet(selectedPet!.id, formData);
-          if (error) {
-            toast.warning(error.message);
-            return;
-          }
-        }
         onFormSubmission();
+
+        const petData = {
+          name: formData.get("name") as string,
+          ownerName: formData.get("ownerName") as string,
+          imageUrl:
+            (formData.get("imageUrl") as string) ||
+            "https://bytegrad.com/course-assets/react-nextjs/pet-placeholder.png",
+          age: +(formData.get("age") as string),
+          notes: formData.get("notes") as string,
+        };
+
+        if (actionType === "add") {
+          await handleAddPet(petData);
+        } else if (actionType === "edit") {
+          await handleEditPet(selectedPet!.id, petData);
+        }
       }}
       // onSubmit={handleSubmit}
       className="flex flex-col"
