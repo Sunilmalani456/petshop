@@ -1,8 +1,33 @@
 "use server";
 
+import { signIn } from "@/lib/auth-edge";
 import prisma from "@/lib/db";
 import { petFormSchema, petIdSchema } from "@/lib/validation";
 import { revalidatePath } from "next/cache";
+import bcrypt from "bcryptjs";
+
+export async function LoginAction(formData: FormData) {
+  // const authData = Object.fromEntries(formData.entries());
+
+  await signIn("credentials", formData);
+}
+
+export async function SignUp(formData: FormData) {
+  const hashedPassword = await bcrypt.hash(
+    formData.get("password") as string,
+    10
+  );
+
+  await prisma.user.create({
+    data: {
+      email: formData.get("email") as string,
+      hashedPassword,
+    },
+  });
+
+  await signIn("credentials", formData);
+}
+
 
 export const AddPet = async (petData: unknown) => {
   const validatedPet = petFormSchema.safeParse(petData);
