@@ -7,19 +7,21 @@ import React from "react";
 import prisma from "@/lib/db";
 import { Toaster } from "sonner";
 import { Pet } from "@prisma/client";
+import { auth } from "@/lib/auth-edge";
+import { redirect } from "next/navigation";
 
 const AppLayout = async ({ children }: { children: React.ReactNode }) => {
-  // const response = await fetch(
-  //   "https://bytegrad.com/course-assets/projects/petsoft/api/pets"
-  // );
+  const Session = await auth();
 
-  // if (!response.ok) {
-  //   throw new Error("Failed to fetch pets");
-  // }
+  if (!Session?.user) {
+    redirect("/login");
+  }
 
-  // const PetData: pet[] = await response.json();
-
-  const PetData: Pet[] = await prisma.pet.findMany();
+  const PetData: Pet[] = await prisma.pet.findMany({
+    where: {
+      userId: Session.user.id,
+    },
+  });
 
   return (
     <>

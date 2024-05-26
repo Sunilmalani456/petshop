@@ -1,15 +1,42 @@
 "use server";
 
-import { signIn } from "@/lib/auth-edge";
+import { auth, signIn } from "@/lib/auth-edge";
 import prisma from "@/lib/db";
 import { petFormSchema, petIdSchema } from "@/lib/validation";
 import { revalidatePath } from "next/cache";
 import bcrypt from "bcryptjs";
+import { redirect } from "next/navigation";
+import { AuthError } from "next-auth";
 
 export async function LoginAction(formData: FormData) {
   // const authData = Object.fromEntries(formData.entries());
+  if (!(formData instanceof FormData)) {
+    return {
+      message: "Invalid form data.",
+    };
+  }
 
-  await signIn("credentials", formData);
+  console.log("formData", formData);
+  try {
+    await signIn("credentials", formData);
+  } catch (error) {
+    if (error instanceof AuthError) {
+      switch (error.type) {
+        case "CredentialsSignin": {
+          return {
+            message: "Invalid credentials.",
+          };
+        }
+        default: {
+          return {
+            message: "Error. Could not sign in.",
+          };
+        }
+      }
+    }
+
+    throw error; // nextjs redirects throws error, so we need to rethrow it
+  }
 }
 
 export async function SignUp(formData: FormData) {
@@ -28,10 +55,13 @@ export async function SignUp(formData: FormData) {
   await signIn("credentials", formData);
 }
 
-
 export const AddPet = async (petData: unknown) => {
-  const validatedPet = petFormSchema.safeParse(petData);
+  const Session = await auth();
+  if (!Session?.user) {
+    redirect("/login");
+  }
 
+  const validatedPet = petFormSchema.safeParse(petData);
   if (!validatedPet.success) {
     return {
       message: "Invalid Pet Data. Please provide valid",
@@ -52,7 +82,14 @@ export const AddPet = async (petData: unknown) => {
     // });
 
     await prisma.pet.create({
-      data: validatedPet.data,
+      data: {
+        ...validatedPet.data,
+        user: {
+          connect: {
+            id: Session.user.id,
+          },
+        },
+      },
     });
 
     revalidatePath("/app", "layout");
@@ -65,12 +102,39 @@ export const AddPet = async (petData: unknown) => {
 };
 
 export const EditPet = async (petId: unknown, newPetData: unknown) => {
+  // authentication check
+  const Session = await auth();
+  if (!Session?.user) {
+    redirect("/login");
+  }
+
+  // validation check
   const validatedPet = petFormSchema.safeParse(newPetData);
   const validatedPetId = petIdSchema.safeParse(petId);
 
   if (!validatedPetId.success || !validatedPet.success) {
     return {
       message: "Invalid Pet Data. Please provide valid",
+    };
+  }
+
+  // authorization check (user owns the pet)
+
+  const pet = await prisma.pet.findUnique({
+    where: {
+      id: validatedPetId.data,
+    },
+  });
+
+  if (!pet) {
+    return {
+      message: "Pet not found",
+    };
+  }
+
+  if (pet.userId !== Session.user.id) {
+    return {
+      message: "You are not authorized to edit this pet",
     };
   }
 
@@ -107,13 +171,39 @@ export const EditPet = async (petId: unknown, newPetData: unknown) => {
 };
 
 export const DeletePet = async (petId: unknown) => {
-  const validatedPetId = petIdSchema.safeParse(petId);
+  // authentication check
+  const Session = await auth();
+  if (!Session?.user) {
+    redirect("/login");
+  }
 
+  const validatedPetId = petIdSchema.safeParse(petId);
   if (!validatedPetId.success) {
     return {
       message: "Invalid Pet Data. Please provide valid",
     };
   }
+
+  // authorization check (user owns the pet)
+  const pet = await prisma.pet.findUnique({
+    where: {
+      id: validatedPetId.data,
+    },
+  });
+
+  if (!pet) {
+    return {
+      message: "Pet not found",
+    };
+  }
+
+  if (pet.userId !== Session.user.id) {
+    return {
+      message: "You are not authorized to delete this pet",
+    };
+  }
+
+  // data mutation
   try {
     await prisma.pet.delete({
       where: {
