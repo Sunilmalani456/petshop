@@ -1,11 +1,15 @@
 import { LoginAction, SignUp } from "@/actions/petAction";
-import { Button } from "./ui/button";
+import { useFormState } from "react-dom";
+import AuthFormBtn from "./auth-form-btn";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 
 const AuthForm = ({ type }: { type: "signUp" | "logIn" }) => {
+  const [signUpError, dispatchSigInAction] = useFormState(SignUp, undefined);
+  const [logInError, dispatchLohInAction] = useFormState(SignUp, undefined);
+
   return (
-    <form action={type === "logIn" ? LoginAction : SignUp}>
+    <form action={type === "logIn" ? dispatchLohInAction : dispatchSigInAction}>
       <div className="space-y-1">
         <Label htmlFor="email">Email</Label>
         <Input
@@ -25,8 +29,14 @@ const AuthForm = ({ type }: { type: "signUp" | "logIn" }) => {
           type="password"
         />
       </div>
+      <AuthFormBtn type={type} />
 
-      <Button className="">{type === "signUp" ? "Sign Up" : "Log In"}</Button>
+      {signUpError && (
+        <p className="text-red-500 text-sm mt-2">{signUpError.message}</p>
+      )}
+      {logInError && (
+        <p className="text-red-500 text-sm mt-2">{logInError.message}</p>
+      )}
     </form>
   );
 };
