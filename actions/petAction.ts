@@ -8,18 +8,17 @@ import { Prisma } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import { AuthError } from "next-auth";
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 
 export async function LoginAction(prevState: unknown, formData: unknown) {
   // check if the formData is FormData type
+  console.log("trying to login");
+
   if (!(formData instanceof FormData)) {
     return {
       message: "Invalid form data.",
     };
   }
 
-  // covert formData to object
-  // const formDataObject = Object.fromEntries(formData.entries());
   try {
     await signIn("credentials", formData);
   } catch (error) {
@@ -39,35 +38,6 @@ export async function LoginAction(prevState: unknown, formData: unknown) {
     }
     throw error; // nextjs redirects throws error, so we need to rethow it
   }
-
-  // redirect("/app/dashboard");
-  // if (!(formData instanceof FormData)) {
-  //   return {
-  //     message: "Invalid form data.",
-  //   };
-  // }
-
-  // console.log("formData", formData);
-  // try {
-  //   await signIn("credentials", formData);
-  // } catch (error) {
-  //   if (error instanceof AuthError) {
-  //     switch (error.type) {
-  //       case "CredentialsSignin": {
-  //         return {
-  //           message: "Invalid credentials.",
-  //         };
-  //       }
-  //       default: {
-  //         return {
-  //           message: "Error. Could not sign in.",
-  //         };
-  //       }
-  //     }
-  //   }
-
-  //   throw error; // nextjs redirects throws error, so we need to rethrow it
-  // }
 }
 
 export async function SignUp(prevState: unknown, formData: unknown) {

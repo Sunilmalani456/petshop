@@ -1,3 +1,4 @@
+"use client";
 import { LoginAction, SignUp } from "@/actions/petAction";
 import { useFormState } from "react-dom";
 import AuthFormBtn from "./auth-form-btn";
@@ -5,11 +6,11 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 
 const AuthForm = ({ type }: { type: "signUp" | "logIn" }) => {
-  const [signUpError, dispatchSigInAction] = useFormState(SignUp, undefined);
-  const [logInError, dispatchLohInAction] = useFormState(SignUp, undefined);
+  const [signUpError, dispatchSignUp] = useFormState(SignUp, undefined);
+  const [logInError, dispatchLogIn] = useFormState(LoginAction, undefined);
 
   return (
-    <form action={type === "logIn" ? dispatchLohInAction : dispatchSigInAction}>
+    <form action={type === "logIn" ? dispatchLogIn : dispatchSignUp}>
       <div className="space-y-1">
         <Label htmlFor="email">Email</Label>
         <Input
