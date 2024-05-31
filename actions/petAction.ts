@@ -8,6 +8,9 @@ import { Prisma } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import { AuthError } from "next-auth";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 export async function LoginAction(prevState: unknown, formData: unknown) {
   // check if the formData is FormData type
@@ -225,4 +228,25 @@ export const DeletePet = async (petId: unknown) => {
       message: "Failed to delete pet",
     };
   }
+};
+
+export const createCheckOutSession = async () => {
+  //  authentication check
+  const session = await checkAuth();
+
+  // create stripe checkout session
+  const checkOutSession = await stripe.checkout.sessions.create({
+    customer_email: session.user?.email,
+    line_items: [
+      {
+        price: "price_1PMREaSCkqXCk2t7jGZnFjMA",
+        quantity: 1,
+      },
+    ],
+    mode: "payment",
+    success_url: `${process.env.CANONICAL_URL}/payment?success=true`,
+    cancel_url: `${process.env.CANONICAL_URL}/payment?cancelled=true`,
+  });
+
+  redirect(checkOutSession.url);
 };
