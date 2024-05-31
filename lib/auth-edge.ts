@@ -61,7 +61,7 @@ const config = {
       }
 
       if (
-        !isLoggedIn &&
+        isLoggedIn &&
         (request.nextUrl.pathname.includes("/login") ||
           request.nextUrl.pathname.includes("/signup")) &&
         auth?.user.hasAccess
